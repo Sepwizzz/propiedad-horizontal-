@@ -1,0 +1,66 @@
+{% extends "./plantillaTipouser.html" %}
+{% block title %} Gestion de habitacion {% endblock %}
+
+
+{% block body %}
+
+<div class="row">
+    <div class="col-sm-12 col-md-6 col-lg-4 col-xl-2">
+        <h1>crear Usuario</h1>
+        <div class="card">
+            <div class="card-body">
+                <li><a href="/sistema/crear_usuario/  " class="nav-btn-book">crear</a></li>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-12 col-md-6 col-lg-8 col-xl-8">
+        <div class="table-responsive py-2">
+            <table class="table table-striped">
+                <thead>
+                    <tr>                                     
+                        <th> email</th>
+                        <th> nombre</th>
+                        <th> apellido</th>
+                        <th> telefono</th>
+                        <th> direccion</th>                       
+                        <th> tipo de Usuario</th>
+                   </tr>
+                </thead>
+                <tbody>
+                    
+                    {% for i in dato %}
+                        <tr>
+                            <td>{{ i.email }}</td>
+                            <td>{{ i.nombre }}</td>
+                            <td>{{ i.apellido }}</td>
+                            <td>{{ i.telefono }}</td>
+                            <td>{{ i.direccion }}</td>
+                            <td>{{ i.rol }}</td>
+                            <!-- <td><a href="actializarhabitacion/{{ i.tipo_servicio }}" class="btn btn-info text-white">Actualizar</a></td> -->
+                            <td><a href="EliminarTipoE/{{ i.email }}" class="btn btn-danger">Eliminar</a></td>
+                        </tr>
+                    
+                    
+                    {% endfor %}
+                </tbody>
+        
+            </table>
+        </div>
+    </div>
+    <style>
+        .nav-btn-book {
+    background-color:#65e5ff; 
+    color: #333;
+    padding: 7px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    transition: all 0.3 ease-in-out;
+    text-align: center;
+}
+    </style>
+</div>
+
+{% endblock %}

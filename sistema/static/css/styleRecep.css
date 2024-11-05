@@ -1,0 +1,36 @@
+@import url('https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@1,500&display=swap');
+
+body {
+    font-family: "Poppins";
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+h1 {
+    text-align: center;
+    margin-top: 50px;
+    color: #333;
+}
+
+.Funciones {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.Funciones button {
+    padding: 15px 25px;
+    margin: 10px;
+    font-size: 18px;
+    background-color: rgb(189, 168, 102);
+    border: none;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.Funciones button:hover {
+    background-color: rgb(212, 185, 98);
+}

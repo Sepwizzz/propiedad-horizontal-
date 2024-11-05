@@ -1,0 +1,66 @@
+{% extends "./plantillaparqueadero.html" %}
+{% block title %} Gestion de habitacion {% endblock %}
+
+
+{% block body %}
+
+<div class="row">
+    <div class="col-sm-12 col-md-6 col-lg-4 col-xl-2">
+        <h1>crear Usuario</h1>
+        <div class="card">
+            <div class="card-body">
+                <li><a href="/sistema/parqueadero/registrparqueadero/" class="nav-btn-book">crear</a></li>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-12 col-md-6 col-lg-8 col-xl-8">
+        <div class="table-responsive py-2">
+            <table class="table table-striped">
+                <thead>
+                    <tr>                                     
+                        <th>Código</th>
+                        <th>Ubicación</th>
+                        <th>Placa Vehículo</th>
+                        <th>Fecha Ingreso</th>
+                        <th>Estado</th>
+                        <th>Guarda</th>
+                   </tr>
+                </thead>
+                <tbody>
+                    {% for parqueadero in parqueaderos %}
+                    <tr>
+                        <td>{{ parqueadero.id }}</td>
+                        <td>{{ parqueadero.tipo }}</td>
+                        <td>{{ parqueadero.placa_vehiculo }}</td>
+                        <td>{{ parqueadero.fecha_ingreso }}</td>
+                        <td>{{ parqueadero.estado }}</td>
+                        <td>{{ parqueadero.id_guarda.nombre }} {{ parqueadero.id_guarda.apellido }}</td>
+                        <td><a href="EliminarTipoE/{{ i.email }}" class="btn btn-danger">Eliminar</a></td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6">No hay parqueaderos registrados.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+    <style>
+        .nav-btn-book {
+    background-color:#65e5ff; 
+    color: #333;
+    padding: 7px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    transition: all 0.3 ease-in-out;
+    text-align: center;
+}
+    </style>
+</div>
+
+{% endblock %}

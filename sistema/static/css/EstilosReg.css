@@ -1,0 +1,86 @@
+@import url('https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800,900&display=swap');
+*
+{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins',sans-serif;
+}
+
+body
+{
+    background-image: url('../images/hotel1.jpg');
+    background-repeat: no-repeat;
+    overflow: hidden;
+    background-size: cover;
+
+}
+
+.container
+{
+    width: 380px;
+    margin: 4% auto;
+    border-radius: 25px;
+    background-color: rgba(0,0,0,0.4);
+    box-shadow: 0 0 15px #333;
+}
+.header
+{
+    text-align: center;
+    padding-top: 75px;
+}
+
+.header h1
+{
+    color: #ffffff;
+    font-size: 45px;
+    margin-bottom: 80px;
+}
+
+.main
+{
+    text-align: center;
+}
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="number"]
+{
+    width: 300px;
+    height: 40px;
+    border: none;
+    outline: none;
+    padding-left: 40px;
+    box-sizing: border-box;
+    font-size: 15px;
+    color: #333;
+    margin-bottom: 40px;
+}
+
+input[type="submit"]
+{
+    padding-left: 0;
+    background-color: rgb(255, 182, 92);
+    letter-spacing: 1px;
+    font-weight: bold;
+}
+
+input[type="submit"]:hover
+{
+    box-shadow: 2px 2px 5px #555;
+    cursor: pointer;
+}
+
+.main span
+{
+    position: relative;
+}
+
+.main i
+{
+    position: absolute;
+    left: 15px;
+    color: #333;
+    font-size: 16px;
+    top: 2px;
+}
