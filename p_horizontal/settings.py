@@ -83,6 +83,8 @@ DATABASES = {
 }
 
 ALLOWED_HOSTS = ['propiedad-horizontal-production.up.railway.app', '127.0.0.1', 'localhost']
+CSRF_TRUSTED_ORIGINS=['https://propiedad-horizontal-production.up.railway.app']
+
 
 
 # Password validation
