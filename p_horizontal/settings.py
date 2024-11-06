@@ -81,6 +81,7 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',  # Ruta del archivo de la base de datos SQLite3
     }
 }
+ALLOWED_HOSTS = ['refererail-production.up.railway.app', '127.0.0.1', 'localhost']
 
 
 
