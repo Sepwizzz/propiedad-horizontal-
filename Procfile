@@ -1,1 +1,1 @@
-web: gunicorn sistema.wsgi 
+web: gunicorn p_horizontal.wsgi 
