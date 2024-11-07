@@ -1,10 +1,10 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect,get_object_or_404
 from django.urls import path,include
 from django.contrib.auth import authenticate, login
 from .models import *
 from django.contrib import messages
 
-from .forms import UsuarioForm, LoginForm,ParqueaderoForm
+from .forms import UsuarioForm, LoginForm,ParqueaderoForm,EditarUsuarioForm
 
 from sistema import views    
 
@@ -24,7 +24,6 @@ def crear_usuario(request):
         form = UsuarioForm()
     return render(request, 'crear_usuario.html', {'form': form})
 
-
 def login_view(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)
@@ -34,13 +33,22 @@ def login_view(request):
             usuario = authenticate(request, username=email, password=contrasena)
             if usuario is not None:
                 login(request, usuario)
-                return redirect('error')  # Cambia esto por tu vista principal
+                
+                # Redirige según el rol del usuario
+                if usuario.rol.strip() == 'Administrador':
+                    return redirect('/sistema/users/tipouser/')  # Cambia 'vista_administrador' por la URL o nombre de vista de administrador
+                elif usuario.rol.strip() == 'Guarda':
+                    return redirect('/sistema/parqueadero/')  # Cambia 'vista_guarda' por la URL o nombre de vista para guardas
+
+                # En caso de un rol desconocido, puedes redirigir a una página de error o principal
+                return redirect('pagina_principal')  # Opcional: redirigir a una página por defecto
             else:
                 form.add_error(None, 'Email o contraseña incorrectos.')
     else:
         form = LoginForm()
     
     return render(request, 'login.html', {'form': form})
+
 
 
 # --tipo_user
@@ -129,7 +137,19 @@ def eliminartipo_user(request, tipo):
     else:
         return redirect("/formularios/login/")
 
-    
+
+
+def editar_usuario(request, usuario_id):
+    usuario = get_object_or_404(Usuario, id=usuario_id)
+    if request.method == 'POST':
+        form = EditarUsuarioForm(request.POST, instance=usuario)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Usuario actualizado correctamente.')
+            return redirect('/sistema/users/tipouser/')  # Cambia esto por la vista donde quieres redirigir después de la edición
+    else:
+        form = EditarUsuarioForm(instance=usuario)
+    return render(request, 'editar_usuario.html', {'form': form})
 
 # --parqueadero
 

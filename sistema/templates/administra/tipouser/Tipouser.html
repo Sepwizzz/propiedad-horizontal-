@@ -38,6 +38,9 @@
                             <td>{{ i.rol }}</td>
                             <!-- <td><a href="actializarhabitacion/{{ i.tipo_servicio }}" class="btn btn-info text-white">Actualizar</a></td> -->
                             <td><a href="EliminarTipoE/{{ i.email }}" class="btn btn-danger">Eliminar</a></td>
+                            <td><a href="{% url 'editar_usuario' i.id %}" class="btn btn-azul">editar</a></td>
+                            
+
                         </tr>
                     
                     
@@ -47,20 +50,6 @@
             </table>
         </div>
     </div>
-    <style>
-        .nav-btn-book {
-    background-color:#65e5ff; 
-    color: #333;
-    padding: 7px 15px;
-    border-radius: 5px;
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: 500;
-    letter-spacing: 1px;
-    transition: all 0.3 ease-in-out;
-    text-align: center;
-}
-    </style>
 </div>
 
 {% endblock %}

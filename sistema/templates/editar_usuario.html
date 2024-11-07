@@ -1,8 +1,12 @@
+<!-- editar_usuario.html -->
+{% block title %}  {% endblock %}
+
+{% block body %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Iniciar Sesión</title>
+    <title>Editar Usuario</title>
     <style>
         /* Configuración básica */
         * {
@@ -36,7 +40,7 @@
             box-shadow: 0 12px 28px rgba(0, 0, 0, 0.3);
         }
 
-        h1 {
+        h2 {
             font-size: 24px;
             margin-bottom: 20px;
             color: #333;
@@ -100,15 +104,15 @@
 </head>
 <body>
     <div class="container">
-        <h1>Iniciar Sesión</h1>
+        <h2>Editar Usuario</h2>
         <form method="post">
             {% csrf_token %}
             {{ form.as_p }}
-            <button type="submit">Iniciar Sesión</button>
+            <button type="submit">Guardar cambios</button>
         </form>
-        {% if form.non_field_errors %}
-            <div class="error">{{ form.non_field_errors }}</div>
-        {% endif %}
     </div>
 </body>
 </html>
+
+
+{% endblock %}

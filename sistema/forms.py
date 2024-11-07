@@ -26,3 +26,10 @@ class ParqueaderoForm(forms.ModelForm):
     class Meta:
         model = Parqueadero
         fields = [ 'tipo', 'placa_vehiculo', 'estado','id_conjunto']  
+
+
+
+class EditarUsuarioForm(forms.ModelForm):
+    class Meta:
+        model = Usuario
+        fields = ['email', 'nombre', 'apellido', 'rol'] 
