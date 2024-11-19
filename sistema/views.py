@@ -257,8 +257,18 @@ def salida_parqueadero(request, parqueadero_id):
 
 
 
+from twilio.rest import Client  # Importa Twilio para el envío de SMS
+
+import os
+from dotenv import load_dotenv
+
+# Cargar el archivo .env
+load_dotenv()
 
 def confirmar_salida_parqueadero(request, parqueadero_id):
+    TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID')
+    TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN')
+    TWILIO_PHONE_NUMBER = os.getenv('TWILIO_PHONE_NUMBER') # Tu número de Twilio
     # Verifica si el usuario está autenticado
     if request.user.is_authenticated:
         try:
@@ -277,11 +287,8 @@ def confirmar_salida_parqueadero(request, parqueadero_id):
                 conjunto = Conjunto.objects.get(id=parqueadero.id_conjunto.id)
                 valor_fraccion_hora = Decimal(conjunto.fraccion_hora)  # Asegúrate de que sea Decimal
 
-                # Calcular el total a pagar (solo basado en el tiempo estacionado por el valor de fraccion_hora)
+                # Calcular el total a pagar
                 valor_total = horas_estacionado_decimal * valor_fraccion_hora
-
-                # Formatear el valor total como pesos colombianos
-                valor_total_formateado = f"${valor_total:,.2f}"
 
                 # Actualiza los valores de total_calculado y fecha_salida
                 parqueadero.total_calculado = valor_total
@@ -289,6 +296,26 @@ def confirmar_salida_parqueadero(request, parqueadero_id):
                 parqueadero.fecha_salida = fecha_salida
                 parqueadero.save()
 
+                # Envía un mensaje SMS al contacto registrado
+                try:
+                    # Verifica si hay un número de contacto
+                    if parqueadero.contacto:
+                        client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+                        mensaje_sms = (
+                            f"Su vehículo con placa {parqueadero.placa_vehiculo} "
+                            f"ha finalizado su estancia. Total a pagar: ${valor_total:,.2f}. "
+                            f"Gracias por usar nuestros servicios."
+                        )
+                        client.messages.create(
+                            body=mensaje_sms,
+                            from_=TWILIO_PHONE_NUMBER,
+                            to='+57'+parqueadero.contacto
+                        )
+                        messages.success(request, "Salida confirmada y SMS enviado exitosamente.")
+                    else:
+                        messages.warning(request, "Salida confirmada, pero no se pudo enviar SMS (sin contacto).")
+                except Exception as e:
+                    messages.error(request, f"Error al enviar SMS: {str(e)}")
 
                 return redirect('/sistema/parqueadero/')
 
@@ -302,7 +329,6 @@ def confirmar_salida_parqueadero(request, parqueadero_id):
 
     else:
         return redirect("/formularios/login/")
-
 
 
 
