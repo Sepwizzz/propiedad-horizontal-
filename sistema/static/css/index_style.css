@@ -19,20 +19,10 @@ html
     --bg-color-2: #f9f6f0;
     --grey-color: rgba(0,0,0,0.20);
     --heading-color: #2c2c2c;
-    --text-color: #353535;
-    --primary-color: rgb(182, 171, 121);
     --nav-items-border-bottom: 1px solid rgba(0,0,0,0.07);
 }
 
-.darkmode{
-    --bg-color-l: #080b0e;
-    --bg-color-2: #101418;
-    --grey-color: #383737;
-    --heading-color: #ffffff;
-    --text-color: #ffffffcc;
-    --primary-color: rgb(182, 171, 121);
-    --nav-items-border-bottom: 1px solid rgba(255,255,255,0.07);
-} */
+
 
 body
 {
@@ -48,7 +38,7 @@ body
 
 ::-webkit-scrollbar-thumb
 {
-    background-color: rgb(182, 171, 121);
+    background-color: rgb(0, 71, 236);
 }
 
 .flex-row
@@ -244,25 +234,6 @@ ul
 
 
 
-.nav-btn-book {
-    background-color: rgb(189, 168, 102); 
-    color: #333;
-    padding: 7px 15px;
-    border-radius: 5px;
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: 500;
-    letter-spacing: 1px;
-    transition: all 0.3 ease-in-out;
-    text-align: center;
-}
-
-
-.nav-btn-book:hover {
-    background-color: #c9be5c; 
-    color: #333; 
-}
-
 /* casa */
 
 #home {
@@ -288,16 +259,16 @@ ul
 
 #home .slide1
 {
-    background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url(../images/hoteln.jpg)
+    background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url(../images/zapan1.jpeg)
 }
 #home .slide2
 {
-    background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url(../images/hoteln2.jpg)
+    background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url(../images/zapan4.jpeg)
 }
 
 #home .slide3
 {
-    background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url(../images/hoteln3.jpg)
+    background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url(../images/zapan3.jpeg)
 }
 #home .slide .content
 {
@@ -446,7 +417,7 @@ ul
 
 #about .text-wrapper
 {
-    padding: 10px 60px;
+    padding: 100px 60px;
     width: 50%;
 }
 
@@ -475,7 +446,7 @@ ul
 #quote
 {
     padding: 150px;
-    background: url("../images/hotel3.jpg");
+    background: url("../images/zapan1.jpeg");
     background-position: top;
     background-size: cover;
     background-repeat: no-repeat;
@@ -673,7 +644,7 @@ ul
 footer
 {
     justify-content: space-between;
-    background-color:rgb(185, 154, 116);
+    background-color:rgb(37, 100, 169);
 }
 
 .footer-top
@@ -945,4 +916,29 @@ footer
     {
         justify-content: center;
     }
+}
+.grid-wrapper {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    /* Tres columnas */
+    gap: 20px;
+    /* Espacio entre elementos */
+}
+
+.team-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 20px;
+    /* Espacio entre filas */
+}
+
+.round-image img {
+    border-radius: 100px;
+    /* Bordes redondeados */
+    max-width: 300px;
+    /* Ancho máximo de la imagen */
+    height: auto;
+    /* Altura automática para mantener la proporción */
 }

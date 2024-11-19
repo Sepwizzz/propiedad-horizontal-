@@ -6,7 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Olympo</title>
+    <title>Bosques De Zapán 2</title>
     <link rel="stylesheet" href="{% static "css/index_style.css" %}">
         <!-- boxicons link  -->
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
@@ -26,27 +26,15 @@
         <!-- navbar seccion inicio -->
 
         <nav id="navbar" class="navbar flex-row">
-            
-            <div class="logo">
-                <h5>Olympo (logo)</h5>
-            </div>
-
-            <ul id="nav-items" class="nav-items">
-                <li><a href="#home" class="nav-links">HOME</a></li>
-                <li><a href="#abouty" class="nav-links">RESERVACIONES</a></li>
-                <li><a href="#menu" class="nav-links">SERVICIOS</a></li>
-                <li><a href="#habs" class="nav-links">HABITACIONES</a></li>
-                
+            <ul id="nav-items" class="nav-items">              
                 {% if user_au == True %}
-                <li><a href="{% url 'logout' %}" class="nav-btn-book">Cerrar sesión</a></li>
+
+                <li><a href="{% url 'logout' %}" class="nav-links">Cerrar sesión</a></li>
                 <li class="welcome-message">Bienvenido <span>{{ name }}</span></li>
                 {% else %}
-                <li><a href="sistema/login/" class="nav-btn-book">Iniciar sesión</a></li>
-                <li><a href="sistema/crear_usuario/  " class="nav-btn-book">crear</a></li>
-
-                {% endif %}
-                
-            
+                <li><a href="sistema/login/" class="nav-links">Iniciar sesión</a></li>
+                <!-- <li><a href="sistema/crear_usuario/  " class="nav-links">crear</a></li> -->
+                {% endif %}                       
             </ul>
 
             <div class="nav-icon menu-btn-wrapper">
@@ -66,45 +54,29 @@
                 <div class="contact-info">telefono: <span>+57 5556666</span> correo:
                     <span>atencionalcliente@olympo.com</span></div>
             <div class="opening-times flex-row">
-                Abierto todos los days / 24 horas. 
-                <ul class="social-links flex-row">
-                    <li><a href="#"><i class="bx bxl-facebook"></i></a></li>
-                    <li><a href="#"><i class="bx bxl-instagram"></i></a></li>
-                    <li><a href="#"><i class="bx bxl-twitter"></i></a></li>
-                    <li><a href="#"><i class="bx bxl-whatsapp"></i></a></li>
-                    <li><a href="#"><i class="bx bxl-youtube"></i></a></li>
-                    
-
-                </ul>
             </div>
         </div>
-        <!-- prenav seccion final -->
 
         
     </header>
-    <!-- seccion inicio home  -->
 
     <section id="home">
         <div class="home_carousel owl-carousel owl-theme">
             <div class="slide slide1">
                 <div class="content">
-                    <p class="subheading">En el hotel</p>
-                    <h1 class="heading">Olympo</h1>
-                    <p class="subheading-2">Dormiras como los Dioses</p>
+                    <p class="subheading">Conjunto Residencial Bosques De Zapán 2 </p>
                 </div>
             </div>
             <div class="slide slide2">
                 <div class="content">
-                    <p class="subheading">Otro texto que añadir</p>
-                    <h1 class="heading">Olympo 2</h1>
-                    <p class="subheading-2">Desde 1847</p>
+                    <p class="subheading">Conjunto Residencial Bosques De Zapán 2 </p>
+
                 </div>
             </div>
             <div class="slide slide3">
                 <div class="content">
-                    <p class="subheading">Texto 3</p>
-                    <h1 class="heading">Olympo 3</h1>
-                    <p class="subheading-2">Desde 1847</p>
+                    <p class="subheading">Conjunto Residencial Bosques De Zapán 2 </p>
+
                 </div>
             </div>
         </div>
@@ -118,47 +90,9 @@
     <section id="about" class="flex-row">
         <div class="booking-form">
             <h2>Reservacion</h2>
-            <form action="/reservaClient/reservaC/" method="post">
-                {% csrf_token %}
-
-                <h5>Numero Documento</h5>
-                <input type="number" name="numero_doc" placeholder="numero de documento" required>
-                <h5>fecha de incio </h5>            
-                <input type="date" placeholder="cantidad personas" name="fecha_in" required class="form-control" id="fecha_in">
-                <h5>fecha de incio </h5>
-                <input type="date" placeholder="cantidad personas" name="fecha_fi" required class="form-control" id="fecha_fi">
-                <button type="submit" class="btn1">hacer reserva</button>
-            </form>
+            
         </div>
-        
-        <script>
-            // Obtiene la fecha actual en formato YYYY-MM-DD
-            var fechaActual = new Date().toISOString().split('T')[0];
-            // Establece la fecha actual como el valor mínimo para el campo de fecha de inicio
-            document.getElementById("fecha_in").setAttribute("min", fechaActual);
-            document.getElementById("fecha_fi").setAttribute("min", fechaActual);
-        
-            // Agrega un event listener al campo de fecha de fin
-            document.getElementById("fecha_fi").addEventListener("change", function() {
-                // Obtiene el valor de la fecha de inicio y la fecha de fin
-                var fechaInicio = new Date(document.getElementById("fecha_in").value);
-                var fechaFin = new Date(this.value); // "this" se refiere al campo de fecha de fin
-        
-                // Compara las fechas
-                if (fechaFin <= fechaInicio) {
-                    // Si la fecha de fin es igual o anterior a la fecha de inicio,
-                    // ajusta la fecha de fin para que sea al menos un día después de la fecha de inicio
-                    var nuevaFechaFin = new Date(fechaInicio);
-                    nuevaFechaFin.setDate(nuevaFechaFin.getDate() + 1); // Suma un día
-                    // Formatea la nueva fecha y actualiza el valor del campo de fecha de fin
-                    var nuevaFechaFinISO = nuevaFechaFin.toISOString().split('T')[0];
-                    document.getElementById("fecha_fi").value = nuevaFechaFinISO;
-                }
-            });
-        </script>
-        
     
-
         <div class="text-wrapper">
             <h1>Olympo</h1>
             <h3>Hotel</h3>
@@ -183,111 +117,10 @@
 
     <!-- quotes end -->
 
-    <!-- Servicios start -->
-
-    <section id="menu" class="menu-section">
-        <div class="section-heading">
-            <h3>Servicios</h3>
-            <div class="square-wrapper flex-row">
-                <div class="square"></div>
-                <div class="square"></div>
-                <div class="square"></div>
-                <div class="square"></div>
-                <div class="square"></div>
-            </div>
-        </div>
-
-        <div class="menu-tabs flex-row">
-            <div class="menu-tab-item active" data-target="#spa">
-                <i class="bx bxs-spa"></i>
-                    <span>Spa</span>
-            </div>
-            <div class="menu-tab-item" data-target="#bar">
-                <i class="bx bx-drink"></i>
-                    <span>Bar</span>
-            </div>
-            <div class="menu-tab-item" data-target="#restaurante">
-                <i class="bx bx-restaurant"></i>
-                    <span>Restaurante</span>
-            </div>
-            <div class="menu-tab-item" data-target="#piscina">
-                <i class="bx bx-swim"></i>
-                    <span>Piscina</span>
-            </div>
-        </div>
-
-        <!-- spa -->
-
-        <div class="menu-tab-content show" id="spa">
-            <div class="menu-item">
-                <div class="menu-item-inner">
-                    <div class="service-img">
-                        <img src="{% static 'images/spa.jpg' %}">
-                    </div>
-                    <div class="text">
-                        <h2>Informacion Spa</h2>
-                        <p>En nuestro spa, sumérgete en una atmósfera de serenidad y bienestar. Desde el momento en que entras, te envolverá una sensación de calma que te preparará para un viaje rejuvenecedor. Nuestro equipo de terapeutas <br> expertos está dedicado a brindarte una experiencia indulgente y personalizada, donde cada tratamiento está diseñado para aliviar el estrés y revitalizar tu cuerpo y mente. <a href="#"></a></p>
-                    </div>
-                </div>
-                
-            </div>
-        </div>
-
-        <!-- bar -->
-
-        <div class="menu-tab-content" id="bar">
-            <div class="menu-item">
-                <div class="menu-item-inner">
-                    <div class="service-img">
-                        <img src="{% static 'images/bar.jpg' %}">
-                    </div>
-                    <div class="text">
-                        <h2>Informacion Bar</h2>
-                        <p>un lugar encantador y acogedor donde los huéspedes pueden disfrutar de una amplia variedad de bebidas y cócteles exquisitos. Con un ambiente elegante y relajante, es el lugar perfecto para relajarse después de un día de actividades. Nuestro amable personal estará encantado de atenderle y ofrecerle una experiencia única en el bar del Hotel Olympo</p>
-                    </div>
-                </div>
-                
-            </div>
-        </div>
-
-<!-- restoran -->
-
-        <div class="menu-tab-content" id="restaurante">
-            <div class="menu-item">
-                <div class="menu-item-inner">
-                    <div class="service-img">
-                        <img src="{% static 'images/restauran.jpg' %}">
-                    </div>
-                    <div class="text">
-                        <h2>Informacion Restaurante</h2>
-                        <p>El restaurante del Hotel Olympo es un destino gastronómico exclusivo que combina la elegancia con una experiencia culinaria excepcional. Ubicado en el corazón del hotel, el restaurante ofrece una variedad de opciones culinarias para satisfacer los paladares más exigentes. Con un ambiente sofisticado y acogedor, es el lugar ideal tanto para una cena romántica como para una reunión de negocios.</p>
-                    </div>
-                </div>
-                
-            </div>
-        </div>
-
-        <!-- piscina  -->
-        <div class="menu-tab-content" id="piscina">
-            <div class="menu-item">
-                <div class="menu-item-inner">
-                    <div class="service-img">
-                        <img src="{% static 'images/piscina.jpg' %}">
-                    </div>
-                    <div class="text">
-                        <h2>Informacion Piscina</h2>
-                        <p>La piscina del Hotel Olympo es un oasis de relajación y diversión ubicado en el centro del complejo hotelero. Diseñada para ofrecer una experiencia de lujo y comodidad, la piscina es el lugar perfecto para escapar del calor y disfrutar de momentos de tranquilidad y recreación.</p>
-                    </div>
-                </div>
-                
-            </div>
-        </div>
-    </section>
-
     <section id="habs">
         <div class="section-heading">
-            <h3>Habitaciones</h3>
-            <h1>Disfruta las mejores Habitaciones</h1>
+            <h3>Conjunto</h3>
+            <h1>Disfruta </h1>
             <div class="square-wrapper flex-row">
                 <div class="square"></div>
                 <div class="square"></div>
@@ -297,176 +130,18 @@
                 <br>
             </div>
         </div>
-
-        <div class="team-carousel owl-carousel owl-theme">
-            <div class="team-card">
-                <div class="img-wrapper">
-                        <img src="{% static 'images/doble1.jpg' %}">
-                </div>
-                <div class="text-wrapper">
-                    <h4 class="name">Sencilla</h4>
-                    <h5 class="desc">La habitación sencilla del Hotel Olympo ofrece comodidad y funcionalidad con una cama tamaño queen, televisión, escritorio y acceso a internet de alta velocidad para una estancia cómoda y conveniente.</h5>
-                </div>
-            </div>
-            <div class="team-card">
-                <div class="img-wrapper">
-                        <img src="{% static 'images/doble1.jpg' %}">
-                </div>
-                <div class="text-wrapper">
-                    <h4 class="name">King</h4>
-                    <h5 class="desc">La habitación King del Hotel Olympo ofrece lujo y confort con una espaciosa cama king-size, decoración elegante y moderna.
-                    </h5>
-                </div>
-            </div>
-            <div class="team-card">
-                <div class="img-wrapper">
-                        <img src="{% static 'images/doble1.jpg' %}">
-                </div>
-                <div class="text-wrapper">
-                    <h4 class="name">Suite</h4>
-                    <h5 class="desc">La habitación doble del Hotel Olympo es un espacio elegante y confortable diseñado para brindar comodidad y relajación a los huéspedes.</h5>
-                </div>
-            </div>
-
-
-            <div class="team-card">
-                <div class="img-wrapper">
-                        <img src="{% static 'images/doble1.jpg' %}">
-                </div>
-                <div class="text-wrapper">
-                    <h4 class="name">Doble</h4>
-                    <h5 class="desc">La habitación doble del Hotel Olympo es un espacio elegante y confortable diseñado para brindar comodidad y relajación a los huéspedes.</h5>
-                </div>
-                </div>
-            </div>
         </div>
     </section>
 
     <section id="quote">
         <div class="text-wrapper">
             <h1>Encontraras lo que Buscas </h1>
-            <h2>En Olympo puedes ver todas las zonas que dispone</h2>
+            <h2>En Olympo puedes ver todas las zonas </h2>
 
         </div>
     </section>
 
-    <section id="tabs">
-        <div class="section-heading">
-            <h3>Galeria</h3>
-            <h1>Disfruta las mejores Habitaciones</h1>
-            <div class="square-wrapper flex-row">
-                <div class="square"></div>
-                <div class="square"></div>
-                <div class="square"></div>
-                <div class="square"></div>
-                <div class="square"></div>
-                <br>
-            </div>
-        </div>
-        <div class="grid-wrapper">
-            <div class="team-card">
-                <div class="img-wrapper round-image">
-                    <img src="{% static 'images/galeria9.jpg' %}" width="200">
-                </div>
-                <div class="text-wrapper">
-                    <h4 class="name">PERFECT</h4>
-                </div>
-            </div>
-            <div class="team-card">
-                <div class="img-wrapper round-image">
-                    <img src="{% static 'images/galeria8.jpg' %}" width="200">
-                </div>
-                <div class="text-wrapper">
-                    <h4 class="name">PERFECT</h4>
-                </div>
-            </div>
-            <div class="team-card">
-                <div class="img-wrapper round-image">
-                    <img src="{% static 'images/galeria7.jpg' %}" width="200">
-                </div>
-                <div class="text-wrapper">
-                    <h4 class="name">PERFECT</h4>
-                </div>
-            </div>
-            <div class="team-card">
-                <div class="img-wrapper round-image">
-                    <img src="{% static 'images/galeria6.jpg' %}" width="200">
-                </div>
-                <div class="text-wrapper">
-                    <h4 class="name">PERFECT</h4>
-                </div>
-            </div>
-            <div class="team-card">
-                <div class="img-wrapper round-image">
-                    <img src="{% static 'images/galeria5.jpg' %}" width="200">
-                </div>
-                <div class="text-wrapper">
-                    <h4 class="name">PERFECT</h4>
-                </div>
-            </div>
-            <div class="team-card">
-                <div class="img-wrapper round-image">
-                    <img src="{% static 'images/galeria4.jpg' %}" width="200">
-                </div>
-                <div class="text-wrapper">
-                    <h4 class="name">PERFECT</h4>
-                </div>
-            </div>
-            <div class="team-card">
-                <div class="img-wrapper round-image">
-                    <img src="{% static 'images/galeria3.jpg' %}" width="200">
-                </div>
-                <div class="text-wrapper">
-                    <h4 class="name">PERFECT</h4>
-                </div>
-            </div>
-            <div class="team-card">
-                <div class="img-wrapper round-image">
-                    <img src="{% static 'images/galeria2.jpg' %}" width="200">
-                </div>
-                <div class="text-wrapper">
-                    <h4 class="name">PERFECT</h4>
-                </div>
-            </div>
-            <div class="team-card">
-                <div class="img-wrapper round-image">
-                    <img src="{% static 'images/galeria1.jpg' %}" width="200">
-                </div>
-                <div class="text-wrapper">
-                    <h4 class="name">PERFECT</h4>
-                </div>
-            </div>
-        </div>
-        </div>
-    </section>
 
-    <style>
-        .grid-wrapper {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            /* Tres columnas */
-            gap: 20px;
-            /* Espacio entre elementos */
-        }
-
-        .team-card {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            margin-bottom: 20px;
-            /* Espacio entre filas */
-        }
-
-        .round-image img {
-            border-radius: 100px;
-            /* Bordes redondeados */
-            max-width: 300px;
-            /* Ancho máximo de la imagen */
-            height: auto;
-            /* Altura automática para mantener la proporción */
-        }
-    </style>
 
     <!-- footer tales -->
 
@@ -477,18 +152,13 @@
 
                 <p class="desc">En lo más alto de una colina, rodeado de exuberante vegetación y con vistas panorámicas que quitan el aliento, se alza el majestuoso Hotel Olympo. Este refugio de lujo combina la elegancia atemporal con el encanto de la naturaleza circundante.</p>
 
-                <ul class="social-links">
-                    <li><a href="#"><i class="icon bx bxl-facebook"></i></a></li>
-                    <li><a href="#"><i class="icon bx bxl-instagram"></i></a></li>
-                    <li><a href="#"><i class="icon bx bxl-twitter"></i></a></li>
-                    <li><a href="#"><i class="icon bx bxl-youtube"></i></a></li>
-                </ul>
+    
             </div>
 
             <div class="flex-col">
                 <h4 class="heading">DIRECCION</h4>
 
-                <p class="desc">Aun no hay direccion</p>
+                <p class="desc">Transversales 5 #3-64, Soacha, Cundinamarca</p>
 
                 <p class="desc">telefono: <span>+57 5556666</span> correo: <span>atencionalcliente@olympo.com</span></p>
 
@@ -528,18 +198,10 @@
                 </ul>
             </div>
 
-            <div class="flex-col">
-                <h4 class="heading">Mas Informacion</h4>
-                <li><a href="#home" class="nav-links">HOME</a></li>
-                <li><a href="#abouty" class="nav-links">RESERVACIONES</a></li>
-                <li><a href="#menu" class="nav-links">SERVICIOS</a></li>
-                <li><a href="#habs" class="nav-links">HABITACIONES</a></li>
-                <li><a href="#tabs" class="nav-links">GALERIA</a></li>
-            </div>
+            
         </div>
 
         <div class="footer-bottom flex-row">
-            <span>Copyright & copy 2024 All rights reserved | Made By Thomas Alvarez</span>
         </div>
     </footer>
 

@@ -157,7 +157,7 @@ def listar_parqueaderos(request):
     if request.user.is_authenticated:
         try:
             usuario_obj = Usuario.objects.get(email=request.user.email)
-            if usuario_obj.rol.strip() == 'Administrador'or 'Guarda':
+            if usuario_obj.rol.strip() in ['Administrador', 'Guarda']:
                 # Obtiene todos los parqueaderos activos
                 parqueaderos = Parqueadero.objects.filter(estado='Activo')
                 return render(request, 'administra/parqueadero/parqueadero.html', {'parqueaderos': parqueaderos})
@@ -178,15 +178,21 @@ def registrar_parqueadero(request):
     if request.user.is_authenticated:
         try:
             usuario_obj = Usuario.objects.get(email=request.user.email)
-            if usuario_obj.rol.strip() == 'Administrador'or 'Guarda':
+            
+            if usuario_obj.rol.strip() in ['Administrador', 'Guarda']:  # Verifica el rol correctamente
                 if request.method == "POST":
                     form = ParqueaderoForm(request.POST)
                     if form.is_valid():
                         parqueadero = form.save(commit=False)  # No guarda inmediatamente
                         parqueadero.fecha_ingreso = timezone.now()  # Establece la fecha de ingreso actual
-                        parqueadero.id_guarda = usuario_obj  # Asigna la instancia de Usuario
+                        parqueadero.id_guarda = usuario_obj 
+                        parqueadero.estado = "Activo" 
+
+                        # Asignamos el conjunto 'zapan' a 'id_conjunto'
+                        conjunto_obj = Conjunto.objects.get(nombre="zapan")
+                        parqueadero.id_conjunto = conjunto_obj
+
                         parqueadero.save()  # Ahora guarda el objeto con la fecha de ingreso
-                        messages.success(request, "Parqueadero registrado exitosamente.")
                         return redirect('/sistema/parqueadero/')
                 else:
                     form = ParqueaderoForm()  # Crea un nuevo formulario si no es POST
@@ -202,39 +208,137 @@ def registrar_parqueadero(request):
     else:
         return redirect("/sistema/login/")
 
+
     
 
-def salidaparqueadero(request, tipo):
-    # Verifica si el usuario está autenticado
+from decimal import Decimal
+
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.utils import timezone
+from decimal import Decimal
+from .models import Parqueadero, Conjunto
+def salida_parqueadero(request, parqueadero_id):
     if request.user.is_authenticated:
         try:
-            # Obtiene el empleado autenticado
-            empleado = Usuario.objects.get(email=request.user.email)
+            parqueadero = Parqueadero.objects.get(id=parqueadero_id)
             
-            # Verifica el rol del empleado
-            if empleado.rol.strip() == 'Administrador':
-                # Obtiene el tipo de empleado a desactivar
-                tipo_E = Usuario.objects.get(email=tipo)
-                
-                # Cambia el estado a inactivo
-                tipo_E.is_active = False
-                tipo_E.save()  # Guarda los cambios en la base de datos
-                
-                # Redirige a la lista de tipos de usuarios
-                messages.success(request, "El tipo de empleado ha sido desactivado.")
-                return redirect("/sistema/users/tipouser/")
+            if parqueadero.estado == 'Activo':
+                fecha_salida = timezone.now()
+                horas_estacionado = (fecha_salida - parqueadero.fecha_ingreso).total_seconds() / 3600
+                horas_estacionado_decimal = Decimal(horas_estacionado).quantize(Decimal('0.00'))
+
+                conjunto = Conjunto.objects.get(id=parqueadero.id_conjunto.id)
+                valor_fraccion_hora = Decimal(conjunto.fraccion_hora)
+
+                valor_total = horas_estacionado_decimal * valor_fraccion_hora
+                valor_total_formateado = f"${valor_total:,.2f}"
+
+                # Actualiza el estado del parqueadero
+
+                # Muestra el mensaje
+                messages.success(request, f"""El vehículo {parqueadero.placa_vehiculo} ha salido.<br>
+                                              Tiempo estacionado: {horas_estacionado_decimal:.2f} horas.<br>
+                                              Total calculado: {valor_total_formateado}.
+                                          """)
+                return redirect('/sistema/parqueadero/')
+
             else:
-                # Si el usuario no tiene el rol adecuado, muestra un mensaje de error
-                messages.error(request, "No tienes permiso para acceder a esta página.")
-                return render(request, 'error.html', {"message": "Usted no tiene permisos para estar acá."})
-        
-        except Usuario.DoesNotExist:
-            messages.error(request, "Usuario no encontrado.")
-            return redirect("/administrador/users/tipouser/")
-        except Exception as e:
-            messages.error(request, f"Ocurrió un error: {str(e)}")
-            return redirect("/administrador/users/tipouser/")
+                messages.error(request, "El parqueadero ya está finalizado.")
+                return redirect("/sistema/parqueadero/")
+
+        except Parqueadero.DoesNotExist:
+            messages.error(request, "Parqueadero no encontrado.")
+            return redirect("/sistema/parqueadero/")
+
     else:
         return redirect("/formularios/login/")
 
-    
+
+
+
+
+def confirmar_salida_parqueadero(request, parqueadero_id):
+    # Verifica si el usuario está autenticado
+    if request.user.is_authenticated:
+        try:
+            # Obtiene el parqueadero por su ID
+            parqueadero = Parqueadero.objects.get(id=parqueadero_id)
+
+            # Verifica si el estado es 'Activo'
+            if parqueadero.estado == 'Activo':
+                fecha_salida = timezone.now()
+
+                # Calcular horas estacionadas en Decimal
+                horas_estacionado = (fecha_salida - parqueadero.fecha_ingreso).total_seconds() / 3600
+                horas_estacionado_decimal = Decimal(horas_estacionado).quantize(Decimal('0.00'))  # Redondear a 2 decimales
+
+                # Obtener el valor de fraccion_hora del conjunto relacionado (en Decimal)
+                conjunto = Conjunto.objects.get(id=parqueadero.id_conjunto.id)
+                valor_fraccion_hora = Decimal(conjunto.fraccion_hora)  # Asegúrate de que sea Decimal
+
+                # Calcular el total a pagar (solo basado en el tiempo estacionado por el valor de fraccion_hora)
+                valor_total = horas_estacionado_decimal * valor_fraccion_hora
+
+                # Formatear el valor total como pesos colombianos
+                valor_total_formateado = f"${valor_total:,.2f}"
+
+                # Actualiza los valores de total_calculado y fecha_salida
+                parqueadero.total_calculado = valor_total
+                parqueadero.estado = 'Finalizado'
+                parqueadero.fecha_salida = fecha_salida
+                parqueadero.save()
+
+
+                return redirect('/sistema/parqueadero/')
+
+            else:
+                messages.error(request, "El parqueadero ya está finalizado.")
+                return redirect("/sistema/parqueadero/")
+
+        except Parqueadero.DoesNotExist:
+            messages.error(request, "Parqueadero no encontrado.")
+            return redirect("/sistema/parqueadero/")
+
+    else:
+        return redirect("/formularios/login/")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# citofonia 
+from django.db.models import Q
+
+def listar_citofonia(request):
+    if request.user.is_authenticated:
+        try:
+            usuario_obj = Usuario.objects.get(email=request.user.email)
+            if usuario_obj.rol.strip() in ['Administrador', 'Guarda']:
+                query = request.GET.get('q', '')  # Obtener el término de búsqueda
+                # Ordenar las propiedades por id (de menor a mayor)
+                if query:
+                    propiedades = Propiedad.objects.filter(numero__icontains=query).order_by('id')
+                else:
+                    propiedades = Propiedad.objects.all().order_by('id')
+                
+                return render(request, 'administra/citofonia/citofonia.html', {'Propiedades': propiedades, 'query': query})
+            else:
+                messages.error(request, "No tienes permiso para acceder a esta página.")
+                return render(request, 'error.html', {"message": "Usted no tiene permisos para estar acá."})
+        except Usuario.DoesNotExist:
+            messages.error(request, "Usuario no encontrado.")
+            return redirect("/sistema/login/")
+    else:
+        return redirect("/sistema/login/")
+

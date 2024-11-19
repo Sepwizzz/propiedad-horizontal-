@@ -36,6 +36,15 @@
           </div>
         </div>
         
+        <div class="d-flex align-items-center">
+          {% if user.is_authenticated %}
+            <span class="me-3">Bienvenido Administrador, {{ user.nombre }} {{ user.apellido }}</span>
+          {% else %}
+            <span class="me-3">No estás logueado</span>
+          {% endif %}
+          
+        
+        
         <!-- Formulario para cerrar sesión -->
         <form action="{% url 'logout' %}" method="post" style="display: inline;">
           {% csrf_token %}

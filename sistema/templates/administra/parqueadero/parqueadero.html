@@ -6,7 +6,7 @@
 
 <div class="row">
     <div class="col-sm-12 col-md-6 col-lg-4 col-xl-2">
-        <h1>crear Usuario</h1>
+        <h1>Registrar ingreso </h1>
         <div class="card">
             <div class="card-body">
                 <li><a href="/sistema/parqueadero/registrparqueadero/" class="nav-btn-book">crear</a></li>
@@ -21,6 +21,7 @@
                         <th>Código</th>
                         <th>Ubicación</th>
                         <th>Placa Vehículo</th>
+                        <th>contacto</th>
                         <th>Fecha Ingreso</th>
                         <th>Estado</th>
                         <th>Guarda</th>
@@ -32,10 +33,14 @@
                         <td>{{ parqueadero.id }}</td>
                         <td>{{ parqueadero.tipo }}</td>
                         <td>{{ parqueadero.placa_vehiculo }}</td>
+                        <td>{{ parqueadero.contacto }}</td>
                         <td>{{ parqueadero.fecha_ingreso }}</td>
                         <td>{{ parqueadero.estado }}</td>
                         <td>{{ parqueadero.id_guarda.nombre }} {{ parqueadero.id_guarda.apellido }}</td>
-                        <td><a href="EliminarTipoE/{{ i.email }}" class="btn btn-danger">Eliminar</a></td>
+                        <td>
+                            <a href="salida/{{ parqueadero.id }}" class="btn btn-link nav-btn-book" id="parqueaderobtn" data-id="{{ parqueadero.id }}">salida</a>
+                            
+                        </td>
                     </tr>
                     {% empty %}
                     <tr>
@@ -61,6 +66,52 @@
     text-align: center;
 }
     </style>
+
+
+    {% if messages %}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Iterar sobre los mensajes de Django para mostrar cada uno
+            {% for message in messages %}
+                Swal.fire({
+                    title: 'Información de salida',
+                    html: '{{ message|escapejs }}',  // Usamos 'html' para mostrar el mensaje formateado
+                    icon: 'success',  // Puede ser 'error' si el mensaje es de error
+                    showCancelButton: true,
+                    confirmButtonText: 'Dar salida',
+                    cancelButtonText: 'Cancelar',
+                    reverseButtons: true  // Esto cambia el orden de los botones
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Capturamos el ID del parqueadero desde el enlace
+                        const button = document.getElementById('parqueaderobtn');  // Esto seleccionará el botón por su ID
+                        const parqueaderoId = button ? button.getAttribute('data-id') : null;
+                        console.log(parqueaderoId)
+                        if (parqueaderoId) {
+                            // Redirigimos con el ID del parqueadero
+                            window.location.href = `/sistema/parqueadero/salida/${parqueaderoId}/confirmar/`;
+                        } else {
+                            // Si no se encuentra el ID, mostramos un error en la consola
+                            console.error("ID de parqueadero no encontrado");
+                        }
+                    } else {
+                        // Si el usuario cancela, redirigimos de vuelta a la lista de parqueaderos
+                        window.location.href = "/sistema/parqueadero/";
+                    }
+                });
+            {% endfor %}
+        });
+    </script>
+{% endif %}
+
+
+    
+  
+
+
+
+
 </div>
 
 {% endblock %}

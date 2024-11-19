@@ -66,6 +66,7 @@ class GuardasConjuntos(models.Model):
 
 # Tabla de parqueaderos (Registro de parqueos con estado, placa y datos del guarda de turno)
 class Parqueadero(models.Model):
+
     ESTADO_CHOICES = [
         ('Activo', 'Activo'),
         ('Finalizado', 'Finalizado'),
@@ -76,6 +77,7 @@ class Parqueadero(models.Model):
     ]
 
     tipo = models.CharField(max_length=15, choices=tipo )
+    contacto = models.CharField(max_length=20)
     placa_vehiculo = models.CharField(max_length=10)
     fecha_ingreso = models.DateTimeField(default=timezone.now)
     fecha_salida = models.DateTimeField(null=True, blank=True)
@@ -88,12 +90,20 @@ class Parqueadero(models.Model):
         return f"Parqueadero {self.codigo} - {self.estado}"
 
 # Tabla de propiedades en cada conjunto (Para registrar los números de contacto de citofonía)
+from django.core.validators import RegexValidator
+
 class Propiedad(models.Model):
-    numero = models.CharField(max_length=10)
+    # Regex pattern for validating phone numbers (example for Colombia)
+    phone_validator = RegexValidator(regex=r'^\+?\d{10,15}$', message="Ingrese un número de teléfono válido.")
+
+    numero = models.CharField(max_length=10, unique=True)
     id_conjunto = models.ForeignKey(Conjunto, on_delete=models.CASCADE)
-    contacto_1 = models.CharField(max_length=20)
-    contacto_2 = models.CharField(max_length=20, blank=True, null=True)
-    contacto_3 = models.CharField(max_length=20, blank=True, null=True)
+    contacto_1 = models.CharField(max_length=20, validators=[phone_validator])
+    nombre_1 = models.CharField(max_length=20 , blank=True,null=True)
+    contacto_2 = models.CharField(max_length=20, blank=True, null=True, validators=[phone_validator])
+    nombre_2 = models.CharField(max_length=20, blank=True, null=True)
+    contacto_3 = models.CharField(max_length=20, blank=True, null=True, validators=[phone_validator])
+    nombre_3 = models.CharField(max_length=20, blank=True, null=True)
 
     def __str__(self):
         return f"Propiedad {self.numero} en {self.id_conjunto.nombre}"
