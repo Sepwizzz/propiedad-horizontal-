@@ -275,7 +275,10 @@ from django.template.loader import render_to_string
 import locale
 
 # Asegúrate de configurar el locale correctamente
-locale.setlocale(locale.LC_ALL, 'es_CO.UTF-8')
+try:
+    locale.setlocale(locale.LC_ALL, 'es_CO.UTF-8')
+except locale.Error:
+    locale.setlocale(locale.LC_ALL, '')  # Usa la configuración predeterminada del sistema
 
 def generar_pdf_xhtml2pdf(parqueadero, valor_total, horas_estacionado, valor_fraccion_hora):
     # Formatear los valores en pesos colombianos
