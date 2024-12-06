@@ -272,28 +272,16 @@ from django.template.loader import render_to_string
 from xhtml2pdf import pisa
 from io import BytesIO
 from django.template.loader import render_to_string
-import locale
-
-# Asegúrate de configurar el locale correctamente
-try:
-    locale.setlocale(locale.LC_ALL, 'es_CO.UTF-8')
-except locale.Error:
-    locale.setlocale(locale.LC_ALL, '')  # Usa la configuración predeterminada del sistema
 
 def generar_pdf_xhtml2pdf(parqueadero, valor_total, horas_estacionado, valor_fraccion_hora):
-    # Formatear los valores en pesos colombianos
-    valor_total_formateado = locale.currency(valor_total, grouping=True)
-    horas_estacionado_formateado = "{:,.2f}".format(horas_estacionado)
-    valor_fraccion_hora_formateado = locale.currency(valor_fraccion_hora, grouping=True)
-
     # Renderizar el HTML con el contexto de los datos
     html = render_to_string('factura_parqueadero.html', {
         'placa_vehiculo': parqueadero.placa_vehiculo,
         'fecha_ingreso': parqueadero.fecha_ingreso,
         'fecha_salida': parqueadero.fecha_salida,
-        'horas_estacionado': horas_estacionado_formateado,
-        'valor_fraccion_hora': valor_fraccion_hora_formateado,
-        'valor_total': valor_total_formateado
+        'horas_estacionado': horas_estacionado,
+        'valor_fraccion_hora': valor_fraccion_hora,
+        'valor_total': valor_total
     })
     
     # Crear un buffer de memoria para el PDF
@@ -310,7 +298,6 @@ def generar_pdf_xhtml2pdf(parqueadero, valor_total, horas_estacionado, valor_fra
         return None  # o puedes manejar el error como desees
     
     return pdf_buffer
-
 
 
 
@@ -337,7 +324,7 @@ def confirmar_salida_parqueadero(request, parqueadero_id):
                 # Calcular el total a pagar
                 valor_total = horas_estacionado_decimal * valor_fraccion_hora
 
-                # Generar el PDF de la factura con formato de números
+                # Generar el PDF de la factura
                 pdf_buffer = generar_pdf_xhtml2pdf(parqueadero, valor_total, horas_estacionado, valor_fraccion_hora)
 
                 # Enviar el correo electrónico con el PDF adjunto
@@ -345,7 +332,7 @@ def confirmar_salida_parqueadero(request, parqueadero_id):
                     asunto = 'Confirmación de salida del parqueadero'
                     mensaje = (
                         f"Estimado usuario, su vehículo con placa {parqueadero.placa_vehiculo} ha salido del parqueadero.\n"
-                        f"Total pagado: {locale.currency(valor_total, grouping=True)}.\n"
+                        f"Total pagado: ${valor_total:,.2f}.\n"
                         f"Gracias por utilizar nuestro servicio. ¡Vuelva pronto!"
                     )
                     destinatario = parqueadero.contacto  # Asumimos que el contacto es un correo electrónico
@@ -383,7 +370,6 @@ def confirmar_salida_parqueadero(request, parqueadero_id):
 
     else:
         return redirect("/formularios/login/")
-
 
 
 
