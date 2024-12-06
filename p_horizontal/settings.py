@@ -17,8 +17,6 @@ import dj_database_url
 from dotenv import load_dotenv 
 import os
 load_dotenv()
-
-
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587  # Usualmente 587 para TLS
@@ -97,7 +95,8 @@ DATABASES = {
 ALLOWED_HOSTS = ['refererail-production.up.railway.app', '127.0.0.1', 'localhost']
 CSRF_TRUSTED_ORIGINS=['https://propiedad-horizontal-production.up.railway.app']
 
-
+ALLOWED_HOSTS = ['propiedad-horizontal-production.up.railway.app', '127.0.0.1', 'localhost']
+CSRF_TRUSTED_ORIGINS=['https://propiedad-horizontal-production.up.railway.app']
 
 
 
