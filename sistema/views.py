@@ -84,8 +84,6 @@ def irtipo_user(request):
 def registartipo_user(request):
     if request.user.is_authenticated:
         empleado = Usuario.objects.get(email=request.user.email)
-       
-
         if empleado.rol.strip() == 'Administrador':
             
             tipo_E=request.POST["tipo"]
@@ -110,7 +108,7 @@ def eliminartipo_user(request, tipo):
         try:
             # Obtiene el empleado autenticado
             empleado = Usuario.objects.get(email=request.user.email)
-            
+        
             # Verifica el rol del empleado
             if empleado.rol.strip() == 'Administrador':
                 # Obtiene el tipo de empleado a desactivar
@@ -257,18 +255,64 @@ def salida_parqueadero(request, parqueadero_id):
 
 
 
-from twilio.rest import Client  # Importa Twilio para el envío de SMS
-
 import os
-from dotenv import load_dotenv
+from twilio.rest import Client
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.utils import timezone
+from decimal import Decimal
+from .models import Parqueadero, Conjunto
+from django.core.mail import EmailMessage
+from django.conf import settings
+from django.shortcuts import redirect
+from django.utils import timezone
+from decimal import Decimal
+from django.template.loader import render_to_string
 
-# Cargar el archivo .env
-load_dotenv()
+from xhtml2pdf import pisa
+from io import BytesIO
+from django.template.loader import render_to_string
+import locale
+
+# Asegúrate de configurar el locale correctamente
+locale.setlocale(locale.LC_ALL, 'es_CO.UTF-8')
+
+def generar_pdf_xhtml2pdf(parqueadero, valor_total, horas_estacionado, valor_fraccion_hora):
+    # Formatear los valores en pesos colombianos
+    valor_total_formateado = locale.currency(valor_total, grouping=True)
+    horas_estacionado_formateado = "{:,.2f}".format(horas_estacionado)
+    valor_fraccion_hora_formateado = locale.currency(valor_fraccion_hora, grouping=True)
+
+    # Renderizar el HTML con el contexto de los datos
+    html = render_to_string('factura_parqueadero.html', {
+        'placa_vehiculo': parqueadero.placa_vehiculo,
+        'fecha_ingreso': parqueadero.fecha_ingreso,
+        'fecha_salida': parqueadero.fecha_salida,
+        'horas_estacionado': horas_estacionado_formateado,
+        'valor_fraccion_hora': valor_fraccion_hora_formateado,
+        'valor_total': valor_total_formateado
+    })
+    
+    # Crear un buffer de memoria para el PDF
+    pdf_buffer = BytesIO()
+
+    # Convertir el HTML a PDF usando xhtml2pdf
+    pisa_status = pisa.pisaDocument(BytesIO(html.encode("UTF-8")), pdf_buffer)
+    
+    # Volver al principio del buffer
+    pdf_buffer.seek(0)
+
+    # Si hay un error al generar el PDF, puedes manejarlo de la siguiente manera:
+    if pisa_status.err:
+        return None  # o puedes manejar el error como desees
+    
+    return pdf_buffer
+
+
+
+
 
 def confirmar_salida_parqueadero(request, parqueadero_id):
-    TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID')
-    TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN')
-    TWILIO_PHONE_NUMBER = os.getenv('TWILIO_PHONE_NUMBER') # Tu número de Twilio
     # Verifica si el usuario está autenticado
     if request.user.is_authenticated:
         try:
@@ -290,33 +334,40 @@ def confirmar_salida_parqueadero(request, parqueadero_id):
                 # Calcular el total a pagar
                 valor_total = horas_estacionado_decimal * valor_fraccion_hora
 
-                # Actualiza los valores de total_calculado y fecha_salida
-                parqueadero.total_calculado = valor_total
-                parqueadero.estado = 'Finalizado'
-                parqueadero.fecha_salida = fecha_salida
-                parqueadero.save()
+                # Generar el PDF de la factura con formato de números
+                pdf_buffer = generar_pdf_xhtml2pdf(parqueadero, valor_total, horas_estacionado, valor_fraccion_hora)
 
-                # Envía un mensaje SMS al contacto registrado
+                # Enviar el correo electrónico con el PDF adjunto
                 try:
-                    # Verifica si hay un número de contacto
-                    if parqueadero.contacto:
-                        client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
-                        mensaje_sms = (
-                            f"Su vehículo con placa {parqueadero.placa_vehiculo} "
-                            f"ha finalizado su estancia. Total a pagar: ${valor_total:,.2f}. "
-                            f"Gracias por usar nuestros servicios."
-                        )
-                        client.messages.create(
-                            body=mensaje_sms,
-                            from_=TWILIO_PHONE_NUMBER,
-                            to='+57'+parqueadero.contacto
-                        )
-                        messages.success(request, "Salida confirmada y SMS enviado exitosamente.")
-                    else:
-                        messages.warning(request, "Salida confirmada, pero no se pudo enviar SMS (sin contacto).")
-                except Exception as e:
-                    messages.error(request, f"Error al enviar SMS: {str(e)}")
+                    asunto = 'Confirmación de salida del parqueadero'
+                    mensaje = (
+                        f"Estimado usuario, su vehículo con placa {parqueadero.placa_vehiculo} ha salido del parqueadero.\n"
+                        f"Total pagado: {locale.currency(valor_total, grouping=True)}.\n"
+                        f"Gracias por utilizar nuestro servicio. ¡Vuelva pronto!"
+                    )
+                    destinatario = parqueadero.contacto  # Asumimos que el contacto es un correo electrónico
 
+                    email = EmailMessage(
+                        asunto,
+                        mensaje,
+                        settings.EMAIL_HOST_USER,  # Remitente
+                        [destinatario],  # Destinatario
+                    )
+                    email.attach('factura_parqueadero.pdf', pdf_buffer.getvalue(), 'application/pdf')
+                    email.send(fail_silently=False)
+
+                    # Si el correo se envía correctamente, actualiza el estado del parqueadero
+                    parqueadero.total_calculado = valor_total
+                    parqueadero.estado = 'Finalizado'
+                    parqueadero.fecha_salida = fecha_salida
+                    parqueadero.save()
+
+                except Exception as e:
+                    messages.error(request, f"Error al enviar el correo: {str(e)}")
+                    # No actualizamos el estado si ocurre un error al enviar el correo
+                    return redirect('/sistema/parqueadero/')
+
+                # Si todo es exitoso, redirige al usuario
                 return redirect('/sistema/parqueadero/')
 
             else:
@@ -329,6 +380,8 @@ def confirmar_salida_parqueadero(request, parqueadero_id):
 
     else:
         return redirect("/formularios/login/")
+
+
 
 
 

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Factura de Parqueadero</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            width: 80%;
+            margin: 20px auto;
+            background-color: white;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+        h1 {
+            text-align: center;
+            color: #0044cc;
+        }
+        .invoice-details {
+            margin: 20px 0;
+        }
+        .invoice-details p {
+            margin: 5px 0;
+        }
+        .table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        .table th, .table td {
+            padding: 8px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        .table th {
+            background-color: #0044cc;
+            color: white;
+        }
+        .total {
+            text-align: right;
+            font-size: 16px;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Factura de Parqueadero</h1>
+
+    <div class="invoice-details">
+        <p><strong>Placa del vehículo:</strong> {{ placa_vehiculo }}</p>
+        <p><strong>Fecha de ingreso:</strong> {{ fecha_ingreso }}</p>
+        <p><strong>Fecha de salida:</strong> {{ fecha_salida }}</p>
+    </div>
+
+    <table class="table">
+        <tr>
+            <th>Descripción</th>
+            <th>Cantidad</th>
+            <th>Precio Unitario</th>
+            <th>Total</th>
+        </tr>
+        <tr>
+            <td>Estacionamiento</td>
+            <td>{{ horas_estacionado }}</td>
+            <td>{{ valor_fraccion_hora }}</td>
+            <td>{{ valor_total }}</td>
+        </tr>
+    </table>
+
+    <div class="total">
+        <p><strong>Total a pagar:</strong> {{ valor_total }}</p>
+    </div>
+
+    <div class="footer">
+        <p>Gracias por utilizar nuestros servicios.</p>
+        <p>Parqueadero XYZ | Dirección | Teléfono</p>
+    </div>
+</div>
+
+</body>
+</html>

@@ -66,18 +66,17 @@ class GuardasConjuntos(models.Model):
 
 # Tabla de parqueaderos (Registro de parqueos con estado, placa y datos del guarda de turno)
 class Parqueadero(models.Model):
-
     ESTADO_CHOICES = [
         ('Activo', 'Activo'),
         ('Finalizado', 'Finalizado'),
     ]
-    tipo = [
+    TIPO_CHOICES = [
         ('moto', 'moto'),
         ('carro', 'carro'),
     ]
 
-    tipo = models.CharField(max_length=15, choices=tipo )
-    contacto = models.CharField(max_length=20)
+    tipo = models.CharField(max_length=15, choices=TIPO_CHOICES)
+    contacto = models.CharField(max_length=254, null=True, blank=True)
     placa_vehiculo = models.CharField(max_length=10)
     fecha_ingreso = models.DateTimeField(default=timezone.now)
     fecha_salida = models.DateTimeField(null=True, blank=True)
@@ -87,7 +86,14 @@ class Parqueadero(models.Model):
     id_guarda = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name="parqueaderos_registrados")
 
     def __str__(self):
-        return f"Parqueadero {self.codigo} - {self.estado}"
+        return f"Parqueadero {self.placa_vehiculo} - {self.estado}"
+
+    # Ejemplo de validación antes de guardar
+    def save(self, *args, **kwargs):
+        if self.estado == 'Finalizado' and self.fecha_salida is None:
+            raise ValueError("La fecha de salida debe ser registrada cuando el estado sea 'Finalizado'.")
+        super().save(*args, **kwargs)
+
 
 # Tabla de propiedades en cada conjunto (Para registrar los números de contacto de citofonía)
 from django.core.validators import RegexValidator
