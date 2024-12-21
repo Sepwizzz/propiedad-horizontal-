@@ -77,7 +77,8 @@ class Parqueadero(models.Model):
 
     tipo = models.CharField(max_length=15, choices=TIPO_CHOICES)
     contacto = models.CharField(max_length=254, null=True, blank=True)
-    placa_vehiculo = models.CharField(max_length=10)
+    casa = models.CharField(max_length=15, null=True, blank=True)
+    placa_vehiculo = models.CharField(max_length=6)
     fecha_ingreso = models.DateTimeField(default=timezone.now)
     fecha_salida = models.DateTimeField(null=True, blank=True)
     total_calculado = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)

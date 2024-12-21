@@ -25,7 +25,16 @@ class LoginForm(forms.Form):
 class ParqueaderoForm(forms.ModelForm):
     class Meta:
         model = Parqueadero
-        fields = [ 'tipo', 'placa_vehiculo','contacto']
+        fields = [ 'tipo', 'placa_vehiculo','contacto','casa']
+
+    contacto = forms.EmailField(
+        label="Correo Electrónico",
+        required=True,
+        error_messages={
+            'invalid': "Por favor, introduce una dirección de correo electrónico válida.",
+            'required': "El campo 'Correo Electrónico' es obligatorio."
+        }
+    )
         
     def clean_contacto(self):
         contacto = self.cleaned_data.get('contacto')

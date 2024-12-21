@@ -24,6 +24,16 @@ urlpatterns = [
     path('citofonia/',views.listar_citofonia,name='listar_citofonia'),
     path('citofonia/citofoniagregar/',views.registrar_parqueadero),
     path('citofonia/citofoniaelimiar/<tipo>',views.eliminartipo_user),
+
+# gestion administrativa
+
+    path('parqueaderoinfo/', views.listar_parqueaderos_gestion),
+    path('parqueaderoinfo/descargar/', views.generar_informe_excel),
+
+    
+
+
+
     
 
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),

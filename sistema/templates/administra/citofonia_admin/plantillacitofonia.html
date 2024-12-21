@@ -11,13 +11,13 @@
       integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
       crossorigin="anonymous"
     />
-    <title>Consultar tipo empleado</title>
+    <title>gestion Guarda</title>
   </head>
 
   <body>
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
       <div class="container-fluid">
-        <a class="navbar-brand" href="/sistema/users/tipouser/">Tipo Empleado</a>
+        <a class="navbar-brand" href="/sistema/citofonia/">Citofonia</a>
         <button
           class="navbar-toggler"
           type="button"
@@ -31,19 +31,18 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
           <div class="navbar-nav">
-            <a class="nav-link" href="/administrador/" target="_parent">Citofonia</a>
-            <a class="nav-link" href="/sistema/parqueaderoinfo/">Parqueadero</a>
+            <a class="nav-link" href="/sistema/parqueadero/" target="_parent">parqueadero</a>
+            <!-- <a class="nav-link" href="/administrador/users">EMPLEADOS</a> -->
           </div>
         </div>
-        
+
         <div class="d-flex align-items-center">
           {% if user.is_authenticated %}
-            <span class="me-3">Bienvenido Administrador, {{ user.nombre }} {{ user.apellido }}</span>
+            <span class="me-3">Bienvenido Guarda, {{ user.nombre }} {{ user.apellido }}</span>
           {% else %}
             <span class="me-3">No estás logueado</span>
           {% endif %}
           
-        
         
         <!-- Formulario para cerrar sesión -->
         <form action="{% url 'logout' %}" method="post" style="display: inline;">
@@ -63,5 +62,4 @@
       crossorigin="anonymous"
     ></script>
   </body>
-  
 </html>

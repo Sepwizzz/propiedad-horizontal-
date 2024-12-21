@@ -237,8 +237,10 @@ def salida_parqueadero(request, parqueadero_id):
                 # Muestra el mensaje
                 messages.success(request, f"""El vehículo {parqueadero.placa_vehiculo} ha salido.<br>
                                               Tiempo estacionado: {horas_estacionado_decimal:.2f} horas.<br>
-                                              Total calculado: {valor_total_formateado}.
-                                          """)
+                                              Total calculado: {valor_total_formateado}.<br>
+                                              id :{parqueadero.id}
+
+                                          """,extra_tags=str(parqueadero.id))
                 return redirect('/sistema/parqueadero/')
 
             else:
@@ -273,12 +275,12 @@ from xhtml2pdf import pisa
 from io import BytesIO
 from django.template.loader import render_to_string
 
-def generar_pdf_xhtml2pdf(parqueadero, valor_total, horas_estacionado, valor_fraccion_hora):
+def generar_pdf_xhtml2pdf(parqueadero, valor_total, horas_estacionado, valor_fraccion_hora,fecha_salida):
     # Renderizar el HTML con el contexto de los datos
     html = render_to_string('factura_parqueadero.html', {
         'placa_vehiculo': parqueadero.placa_vehiculo,
         'fecha_ingreso': parqueadero.fecha_ingreso,
-        'fecha_salida': parqueadero.fecha_salida,
+        'fecha_salida': fecha_salida,
         'horas_estacionado': horas_estacionado,
         'valor_fraccion_hora': valor_fraccion_hora,
         'valor_total': valor_total
@@ -324,8 +326,12 @@ def confirmar_salida_parqueadero(request, parqueadero_id):
                 # Calcular el total a pagar
                 valor_total = horas_estacionado_decimal * valor_fraccion_hora
 
+                if valor_total < Decimal('700.00'):
+                    valor_total = Decimal('0.00')
+
+
                 # Generar el PDF de la factura
-                pdf_buffer = generar_pdf_xhtml2pdf(parqueadero, valor_total, horas_estacionado, valor_fraccion_hora)
+                pdf_buffer = generar_pdf_xhtml2pdf(parqueadero, valor_total, horas_estacionado, valor_fraccion_hora,fecha_salida)
 
                 # Enviar el correo electrónico con el PDF adjunto
                 try:
@@ -409,4 +415,135 @@ def listar_citofonia(request):
             return redirect("/sistema/login/")
     else:
         return redirect("/sistema/login/")
+
+# gestion administrativa 
+
+from django.core.paginator import Paginator
+def listar_parqueaderos_gestion(request):
+    if request.user.is_authenticated:
+        try:
+            usuario_obj = Usuario.objects.get(email=request.user.email)
+            if usuario_obj.rol.strip() in ['Administrador']:
+                # Obtiene todos los parqueaderos con estado 'Finalizado' y los ordena por 'id' (de menor a mayor)
+                parqueaderos = Parqueadero.objects.filter(estado='Finalizado').order_by('id')
+
+                # Configura la paginación
+                paginator = Paginator(parqueaderos, 15)  # 15 elementos por página
+                page_number = request.GET.get('page')  # Número de página actual
+                page_obj = paginator.get_page(page_number)
+
+                return render(request, 'administra/parqueadero_admin/parqueadero.html', {'page_obj': page_obj})
+            else:
+                messages.error(request, "No tienes permiso para acceder a esta página.")
+                return render(request, 'error.html', {"message": "Usted no tiene permisos para estar acá."})
+        
+        except Usuario.DoesNotExist:
+            messages.error(request, "Usuario no encontrado.")
+            return redirect("/sistema/login/")
+    else:
+        return redirect("/sistema/login/")
+    
+
+import openpyxl
+from datetime import datetime
+from django.http import HttpResponse
+from django.utils import timezone
+from .models import Parqueadero
+from openpyxl.styles import Font
+from openpyxl.styles import Font, Border, Side
+
+def generar_informe_excel(request):
+    if request.method == 'POST':
+        # Obtener las fechas del formulario
+        fecha_inicio = request.POST.get('fecha_inicio')
+        fecha_fin = request.POST.get('fecha_fin')
+
+        # Convertir las fechas de formato string a datetime
+        fecha_inicio = datetime.strptime(fecha_inicio, '%Y-%m-%d')  # Convertir a datetime
+        fecha_fin = datetime.strptime(fecha_fin, '%Y-%m-%d')  # Convertir a datetime
+
+        # Asegurarse de que la fecha de fin cubra hasta las 23:59:59
+        fecha_fin = fecha_fin.replace(hour=23, minute=59, second=59, microsecond=999999)
+
+        # Filtrar los parqueaderos según las fechas y el estado 'Finalizado', ordenados por id de menor a mayor
+        parqueaderos = Parqueadero.objects.filter(
+            fecha_ingreso__gte=fecha_inicio,
+            fecha_ingreso__lte=fecha_fin,
+            estado='Finalizado'
+        ).order_by('id')
+
+        # Crear un libro de Excel
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = 'Informe Parqueaderos'
+
+        # Escribir los encabezados
+        ws['A1'] = 'Código'
+        ws['B1'] = 'Ubicación'
+        ws['C1'] = 'Placa Vehículo'
+        ws['D1'] = 'Contacto'
+        ws['E1'] = 'Casa'
+        ws['F1'] = 'Fecha Ingreso'
+        ws['G1'] = 'Fecha Salida'
+        ws['H1'] = 'Estado'
+        ws['I1'] = 'Guarda'
+        ws['J1'] = 'Total CANCELADO'
+        ws['K1'] = 'Total CANCELADO'
+        # Crear un estilo de fuente en negrilla
+        bold_font = Font(bold=True)
+
+        # Crear un estilo de borde
+        thin_border = Border(
+            left=Side(style='thin'),
+            right=Side(style='thin'),
+            top=Side(style='thin'),
+            bottom=Side(style='thin')
+        )
+
+        # Lista de encabezados
+        headers = ['Código', 'Ubicación', 'Placa Vehículo', 'Contacto', 'Casa', 'Fecha Ingreso', 
+                'Fecha Salida', 'Estado', 'Guarda', 'Total CANCELADO', 'Total CANCELADO']
+
+        # Aplicar los estilos a cada celda de encabezado
+        for col, header in enumerate(headers, start=1):  # Enumerar desde la columna 1
+            cell = ws.cell(row=1, column=col)  # Seleccionar la celda
+            cell.value = header  # Asignar el valor del encabezado
+            cell.font = bold_font  # Aplicar negrilla
+            cell.border = thin_border  # Aplicar bordes
+
+
+        # Escribir los datos de los parqueaderos
+        row = 2  # Empezamos a escribir en la fila 2 (debajo de los encabezados)
+        for parqueadero in parqueaderos:
+            ws[f'A{row}'] = parqueadero.id
+            ws[f'B{row}'] = parqueadero.tipo
+            ws[f'C{row}'] = parqueadero.placa_vehiculo
+            ws[f'D{row}'] = parqueadero.contacto
+            ws[f'E{row}'] = parqueadero.casa
+            ws[f'F{row}'] = parqueadero.fecha_ingreso.strftime('%Y-%m-%d %H:%M:%S')
+            ws[f'G{row}'] = parqueadero.fecha_salida.strftime('%Y-%m-%d %H:%M:%S') if parqueadero.fecha_salida else ''
+            ws[f'H{row}'] = parqueadero.estado
+            ws[f'I{row}'] = f'{parqueadero.id_guarda.nombre} {parqueadero.id_guarda.apellido}'
+
+            total_fila = row
+            # Formatear el total calculado a dos decimales
+            ws[f'J{row}'] = float(parqueadero.total_calculado) if parqueadero.total_calculado else 0
+            ws[f'K2'] = f"=SUM(j2:j{total_fila})" 
+
+            
+            row += 1
+            bold_font = Font(bold=True)
+            ws[f'K2'].font = bold_font
+
+        # Crear una respuesta HTTP para descargar el archivo Excel
+        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = 'attachment; filename=Informe_Parqueaderos.xlsx'
+
+        # Guardar el archivo en la respuesta HTTP
+        wb.save(response)
+        return response
+
+    return render(request, 'ruta_del_template_con_formulario.html')
+
+
 

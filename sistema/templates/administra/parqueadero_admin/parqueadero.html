@@ -1,0 +1,114 @@
+{% extends "./plantillaparqueadero.html" %}
+{% block title %} Gestión de Habitaciones {% endblock %}
+
+{% block body %}
+
+<div class="row">
+    <div class="col-sm-12 col-md-6 col-lg-4 col-xl-2">
+        <h1>Buscador</h1>
+        <div class="card">
+            <div class="card-body">
+                <!-- Formulario para seleccionar fechas -->
+                <form action="/sistema/parqueaderoinfo/descargar/" method="POST">
+                    {% csrf_token %}
+                    
+                    <div class="form-group">
+                        <label for="fecha_inicio">Fecha de Inicio</label>
+                        <input type="date" id="fecha_inicio" name="fecha_inicio" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="fecha_fin">Fecha de Fin</label>
+                        <input type="date" id="fecha_fin" name="fecha_fin" class="form-control" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Enviar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-12 col-md-6 col-lg-8 col-xl-8">
+        <div class="table-responsive py-2">
+            <table class="table table-striped">
+                <thead>
+                    <tr>                                     
+                        <th>Código</th>
+                        <th>Ubicación</th>
+                        <th>Placa Vehículo</th>
+                        <th>Contacto</th>
+                        <th>Fecha Ingreso</th>
+                        <th>Estado</th>
+                        <th>Guarda</th>
+                        <th>Cancelado</th>
+                   </tr>
+                </thead>
+                <tbody>
+                    {% for parqueadero in page_obj.object_list %}
+                    <tr>
+                        <td>{{ parqueadero.id }}</td>
+                        <td>{{ parqueadero.tipo }}</td>
+                        <td>{{ parqueadero.placa_vehiculo }}</td>
+                        <td>{{ parqueadero.contacto }}</td>
+                        <td>{{ parqueadero.fecha_ingreso }}</td>
+                        <td>{{ parqueadero.estado }}</td>
+                        <td>{{ parqueadero.id_guarda.nombre }} {{ parqueadero.id_guarda.apellido }}</td>
+                        <td>{{ parqueadero.total_calculado }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8">No hay parqueaderos registrados.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            
+            <!-- Paginación -->
+            <div class="pagination">
+                {% if page_obj.has_previous %}
+                    <a href="?page=1">&laquo; Primera</a>
+                    <a href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+                {% endif %}
+                
+                <span> Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }} </span>
+                
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+                    <a href="?page={{ page_obj.paginator.num_pages }}">Última &raquo;</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+    .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;  /* Espacio entre los elementos */
+    font-size: 14px;
+}
+
+.pagination-link {
+    text-decoration: none;
+    padding: 5px 10px;
+    border: 1px solid #007bff;
+    border-radius: 5px;
+    color: #007bff;
+    transition: background-color 0.3s ease;
+}
+
+.pagination-link:hover {
+    background-color: #007bff;
+    color: white;
+}
+
+.pagination-info {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+
+</style>
+
+{% endblock %}

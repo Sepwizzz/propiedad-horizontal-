@@ -11,13 +11,16 @@
       integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
       crossorigin="anonymous"
     />
-    <title>Consultar tipo empleado</title>
+    <!-- Incluir SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <title>gestion Guarda</title>
   </head>
 
   <body>
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
       <div class="container-fluid">
-        <a class="navbar-brand" href="/sistema/users/tipouser/">Tipo Empleado</a>
+        <a class="navbar-brand" href="/sistema/parqueaderoinfo/">Parqueadero</a>
         <button
           class="navbar-toggler"
           type="button"
@@ -31,14 +34,16 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
           <div class="navbar-nav">
-            <a class="nav-link" href="/administrador/" target="_parent">Citofonia</a>
-            <a class="nav-link" href="/sistema/parqueaderoinfo/">Parqueadero</a>
+            <a class="nav-link" href="/sistema/citofonia/" target="_parent">citofonia</a>
+            <a class="nav-link" href="/sistema/users/tipouser/">usuarios</a>
+
           </div>
         </div>
+
         
         <div class="d-flex align-items-center">
           {% if user.is_authenticated %}
-            <span class="me-3">Bienvenido Administrador, {{ user.nombre }} {{ user.apellido }}</span>
+            <span class="me-3">Bienvenido administrador, {{ user.nombre }} {{ user.apellido }}</span>
           {% else %}
             <span class="me-3">No estás logueado</span>
           {% endif %}
@@ -48,7 +53,7 @@
         <!-- Formulario para cerrar sesión -->
         <form action="{% url 'logout' %}" method="post" style="display: inline;">
           {% csrf_token %}
-          <button type="submit" class="btn btn-link nav-btn-book">Cerrar sesión</button>
+          <button type="submit" class="nav_btn_book_red">Cerrar sesión</button>
         </form>
       </div>
     </nav>
@@ -62,6 +67,19 @@
       integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
       crossorigin="anonymous"
     ></script>
+    <style>
+      .nav_btn_book_red {
+    background-color:#65e5ff; 
+    color: #333;
+    padding: 7px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    transition: all 0.3 ease-in-out;
+    text-align: center;
+}
+    </style>
   </body>
-  
 </html>

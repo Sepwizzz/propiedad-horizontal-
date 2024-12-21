@@ -52,7 +52,7 @@
         <!-- Formulario para cerrar sesión -->
         <form action="{% url 'logout' %}" method="post" style="display: inline;">
           {% csrf_token %}
-          <button type="submit" class="btn btn-link nav-btn-book">Cerrar sesión</button>
+          <button type="submit" class="nav_btn_book_red">Cerrar sesión</button>
         </form>
       </div>
     </nav>
@@ -66,5 +66,19 @@
       integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
       crossorigin="anonymous"
     ></script>
+    <style>
+      .nav_btn_book_red {
+    background-color:#65e5ff; 
+    color: #333;
+    padding: 7px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    transition: all 0.3 ease-in-out;
+    text-align: center;
+}
+    </style>
   </body>
 </html>

@@ -9,7 +9,7 @@
         <h1>Registrar ingreso </h1>
         <div class="card">
             <div class="card-body">
-                <li><a href="/sistema/parqueadero/registrparqueadero/" class="nav-btn-book">crear</a></li>
+                <li><a href="/sistema/parqueadero/registrparqueadero/" class="nav_btn_book">crear</a></li>
             </div>
         </div>
     </div>
@@ -19,12 +19,14 @@
                 <thead>
                     <tr>                                     
                         <th>Código</th>
-                        <th>Ubicación</th>
+                        <th>tipo</th>
                         <th>Placa Vehículo</th>
                         <th>contacto</th>
+                        <th>casa</th>
                         <th>Fecha Ingreso</th>
                         <th>Estado</th>
                         <th>Guarda</th>
+                        <th>salida</th>
                    </tr>
                 </thead>
                 <tbody>
@@ -34,11 +36,17 @@
                         <td>{{ parqueadero.tipo }}</td>
                         <td>{{ parqueadero.placa_vehiculo }}</td>
                         <td>{{ parqueadero.contacto }}</td>
+                        <td>{{ parqueadero.casa }}</td>
                         <td>{{ parqueadero.fecha_ingreso }}</td>
                         <td>{{ parqueadero.estado }}</td>
                         <td>{{ parqueadero.id_guarda.nombre }} {{ parqueadero.id_guarda.apellido }}</td>
                         <td>
-                            <a href="salida/{{ parqueadero.id }}" class="btn btn-link nav-btn-book" id="parqueaderobtn" data-id="{{ parqueadero.id }}">salida</a>
+
+                                <a href="salida/{{ parqueadero.id }}" 
+                                class="nav-btn-book" 
+                                data-id="{{ parqueadero.id }}">Salida</a>
+
+                            
                             
                         </td>
                     </tr>
@@ -54,6 +62,18 @@
     </div>
     <style>
         .nav-btn-book {
+    background-color:#ff0008; 
+    color: #000000;
+    padding: 7px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    transition: all 0.3 ease-in-out;
+    text-align: center;
+}
+.nav_btn_book_red {
     background-color:#65e5ff; 
     color: #333;
     padding: 7px 15px;
@@ -65,46 +85,58 @@
     transition: all 0.3 ease-in-out;
     text-align: center;
 }
+.nav_btn_book {
+    background-color:#00ae06; 
+    color: #000000;
+    padding: 7px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    transition: all 0.3 ease-in-out;
+    text-align: center;
+}
     </style>
 
+{% if messages %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Iterar sobre los mensajes de Django para mostrar cada uno
+        {% for message in messages %}
+            Swal.fire({
+                title: 'Información de salida',
+                html: '{{ message|escapejs }}', // Formatear el mensaje con escapejs
+                icon: 'success', // Cambiar a 'error' si el mensaje es de error
+                showCancelButton: true,
+                confirmButtonText: 'Dar salida',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true // Esto cambia el orden de los botones
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Capturar el ID desde las etiquetas del mensaje (extra_tags o similar)
+                    const parqueaderoId = '{{ message.extra_tags|default_if_none:"" }}';
 
-    {% if messages %}
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Iterar sobre los mensajes de Django para mostrar cada uno
-            {% for message in messages %}
-                Swal.fire({
-                    title: 'Información de salida',
-                    html: '{{ message|escapejs }}',  // Usamos 'html' para mostrar el mensaje formateado
-                    icon: 'success',  // Puede ser 'error' si el mensaje es de error
-                    showCancelButton: true,
-                    confirmButtonText: 'Dar salida',
-                    cancelButtonText: 'Cancelar',
-                    reverseButtons: true  // Esto cambia el orden de los botones
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        // Capturamos el ID del parqueadero desde el enlace
-                        const button = document.getElementById('parqueaderobtn');  // Esto seleccionará el botón por su ID
-                        const parqueaderoId = button ? button.getAttribute('data-id') : null;
-                        console.log(parqueaderoId)
-                        if (parqueaderoId) {
-                            // Redirigimos con el ID del parqueadero
-                            window.location.href = `/sistema/parqueadero/salida/${parqueaderoId}/confirmar/`;
-                        } else {
-                            // Si no se encuentra el ID, mostramos un error en la consola
-                            console.error("ID de parqueadero no encontrado");
-                        }
+                    if (parqueaderoId) {
+                        console.log("ID capturado:", parqueaderoId); // Muestra el ID capturado
+                        // Redirigir al endpoint de salida
+                        window.location.href = `/sistema/parqueadero/salida/${parqueaderoId}/confirmar/`;
                     } else {
-                        // Si el usuario cancela, redirigimos de vuelta a la lista de parqueaderos
-                        window.location.href = "/sistema/parqueadero/";
+                        console.log("ID capturado:", parqueaderoId); 
+                        console.error("ID de parqueadero no encontrado en el mensaje .");
                     }
-                });
-            {% endfor %}
-        });
-    </script>
-    
+                } else {
+                    // Si el usuario cancela, redirigimos de vuelta a la lista de parqueaderos
+                    window.location.href = "/sistema/parqueadero/";
+                }
+            });
+        {% endfor %}
+    });
+</script>
 {% endif %}
+
+
 
 
     
