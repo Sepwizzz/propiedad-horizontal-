@@ -423,7 +423,7 @@ def listar_parqueaderos_gestion(request):
     if request.user.is_authenticated:
         try:
             usuario_obj = Usuario.objects.get(email=request.user.email)
-            if usuario_obj.rol.strip() in ['Administrador']:
+            if usuario_obj.rol.strip() in ['Administrador', 'Guarda']:
                 # Obtiene todos los parqueaderos con estado 'Finalizado' y los ordena por 'id' (de menor a mayor)
                 parqueaderos = Parqueadero.objects.filter(estado='Finalizado').order_by('id')
 
