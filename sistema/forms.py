@@ -27,14 +27,7 @@ class ParqueaderoForm(forms.ModelForm):
         model = Parqueadero
         fields = [ 'tipo', 'placa_vehiculo','contacto','casa']
 
-    contacto = forms.EmailField(
-        label="Correo Electrónico",
-        required=True,
-        error_messages={
-            'invalid': "Por favor, introduce una dirección de correo electrónico válida.",
-            'required': "El campo 'Correo Electrónico' es obligatorio."
-        }
-    )
+ 
         
     def clean_contacto(self):
         contacto = self.cleaned_data.get('contacto')
