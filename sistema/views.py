@@ -208,14 +208,12 @@ def registrar_parqueadero(request):
 
 
     
-
-from decimal import Decimal
-
+import math
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.utils import timezone
-from decimal import Decimal
 from .models import Parqueadero, Conjunto
+
 def salida_parqueadero(request, parqueadero_id):
     if request.user.is_authenticated:
         try:
@@ -224,19 +222,20 @@ def salida_parqueadero(request, parqueadero_id):
             if parqueadero.estado == 'Activo':
                 fecha_salida = timezone.now()
                 horas_estacionado = (fecha_salida - parqueadero.fecha_ingreso).total_seconds() / 3600
-                horas_estacionado_decimal = Decimal(horas_estacionado).quantize(Decimal('0.00'))
+                # Redondear hacia arriba siempre
+                horas_estacionado_entero = math.ceil(horas_estacionado)
 
                 conjunto = Conjunto.objects.get(id=parqueadero.id_conjunto.id)
                 valor_fraccion_hora = Decimal(conjunto.fraccion_hora)
 
-                valor_total = horas_estacionado_decimal * valor_fraccion_hora
+                valor_total = Decimal(horas_estacionado_entero) * valor_fraccion_hora
                 valor_total_formateado = f"${valor_total:,.2f}"
 
                 # Actualiza el estado del parqueadero
 
                 # Muestra el mensaje
                 messages.success(request, f"""El vehículo {parqueadero.placa_vehiculo} ha salido.<br>
-                                              Tiempo estacionado: {horas_estacionado_decimal:.2f} horas.<br>
+                                              Tiempo estacionado: {horas_estacionado_entero} horas.<br>
                                               Total calculado: {valor_total_formateado}.<br>
                                               id :{parqueadero.id}
 
@@ -253,6 +252,8 @@ def salida_parqueadero(request, parqueadero_id):
 
     else:
         return redirect("/formularios/login/")
+
+
 
 
 
@@ -327,7 +328,7 @@ def confirmar_salida_parqueadero(request, parqueadero_id):
                 valor_total = horas_estacionado_decimal * valor_fraccion_hora
 
                 if valor_total < Decimal('700.00'):
-                    valor_total = Decimal('0.00')
+                    valor_total = Decimal('700.00')
 
 
                 # Generar el PDF de la factura
