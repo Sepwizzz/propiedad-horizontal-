@@ -303,8 +303,6 @@ def generar_pdf_xhtml2pdf(parqueadero, valor_total, horas_estacionado, valor_fra
     return pdf_buffer
 
 
-
-
 def confirmar_salida_parqueadero(request, parqueadero_id):
     # Verifica si el usuario está autenticado
     if request.user.is_authenticated:
@@ -322,47 +320,74 @@ def confirmar_salida_parqueadero(request, parqueadero_id):
 
                 # Obtener el valor de fraccion_hora del conjunto relacionado (en Decimal)
                 conjunto = Conjunto.objects.get(id=parqueadero.id_conjunto.id)
-                valor_fraccion_hora = Decimal(conjunto.fraccion_hora)  # Asegúrate de que sea Decimal
+                valor_fraccion_hora = Decimal(conjunto.fraccion_hora)
 
                 # Calcular el total a pagar
                 valor_total = horas_estacionado_decimal * valor_fraccion_hora
 
+                # Monto mínimo
                 if valor_total < Decimal('700.00'):
                     valor_total = Decimal('700.00')
 
+                # Actualiza el estado del parqueadero antes de renderizar o enviar el correo
+                parqueadero.total_calculado = valor_total
+                parqueadero.estado = 'Finalizado'
+                parqueadero.fecha_salida = fecha_salida
+                parqueadero.save()
+
+                # Verificar si el correo electrónico está presente y válido
+                destinatario = parqueadero.contacto
+                if not destinatario or '@' not in destinatario:
+                    messages.warning(request, "El correo electrónico no está configurado o no es válido.")
+
+                    # Renderizar la factura en HTML como alternativa
+                    return render(request, 'factura_parqueadero.html', {
+                        'placa_vehiculo': parqueadero.placa_vehiculo,
+                        'fecha_ingreso': parqueadero.fecha_ingreso,
+                        'fecha_salida': fecha_salida,
+                        'horas_estacionado': horas_estacionado_decimal,
+                        'valor_fraccion_hora': valor_fraccion_hora,
+                        'valor_total': valor_total,
+                    })
 
                 # Generar el PDF de la factura
-                pdf_buffer = generar_pdf_xhtml2pdf(parqueadero, valor_total, horas_estacionado, valor_fraccion_hora,fecha_salida)
+                pdf_buffer = generar_pdf_xhtml2pdf(parqueadero, valor_total, horas_estacionado, valor_fraccion_hora, fecha_salida)
 
-                # Enviar el correo electrónico con el PDF adjunto
                 try:
-                    asunto = 'Confirmación de salida del parqueadero'
-                    mensaje = (
-                        f"Estimado usuario, su vehículo con placa {parqueadero.placa_vehiculo} ha salido del parqueadero.\n"
-                        f"Total pagado: ${valor_total:,.2f}.\n"
-                        f"Gracias por utilizar nuestro servicio. ¡Vuelva pronto!"
-                    )
-                    destinatario = parqueadero.contacto  # Asumimos que el contacto es un correo electrónico
+                    if pdf_buffer:
+                        # Configuración del correo electrónico
+                        asunto = 'Confirmación de salida del parqueadero'
+                        mensaje = (
+                            f"Estimado usuario, su vehículo con placa {parqueadero.placa_vehiculo} ha salido del parqueadero.\n"
+                            f"Total pagado: ${valor_total:,.2f}.\n"
+                            f"Gracias por utilizar nuestro servicio. ¡Vuelva pronto!"
+                        )
 
-                    email = EmailMessage(
-                        asunto,
-                        mensaje,
-                        settings.EMAIL_HOST_USER,  # Remitente
-                        [destinatario],  # Destinatario
-                    )
-                    email.attach('factura_parqueadero.pdf', pdf_buffer.getvalue(), 'application/pdf')
-                    email.send(fail_silently=False)
+                        email = EmailMessage(
+                            asunto,
+                            mensaje,
+                            settings.EMAIL_HOST_USER,  # Remitente
+                            [destinatario],  # Destinatario
+                        )
+                        email.attach('factura_parqueadero.pdf', pdf_buffer.getvalue(), 'application/pdf')
+                        email.send(fail_silently=False)
 
-                    # Si el correo se envía correctamente, actualiza el estado del parqueadero
-                    parqueadero.total_calculado = valor_total
-                    parqueadero.estado = 'Finalizado'
-                    parqueadero.fecha_salida = fecha_salida
-                    parqueadero.save()
+                    else:
+                        raise ValueError("Error al generar el PDF.")
 
                 except Exception as e:
+                    # Manejo de errores en el envío del correo
                     messages.error(request, f"Error al enviar el correo: {str(e)}")
-                    # No actualizamos el estado si ocurre un error al enviar el correo
-                    return redirect('/sistema/parqueadero/')
+
+                    # Renderizar la factura en HTML como alternativa
+                    return render(request, 'factura_parqueadero2.html', {
+                        'placa_vehiculo': parqueadero.placa_vehiculo,
+                        'fecha_ingreso': parqueadero.fecha_ingreso,
+                        'fecha_salida': fecha_salida,
+                        'horas_estacionado': horas_estacionado_decimal,
+                        'valor_fraccion_hora': valor_fraccion_hora,
+                        'valor_total': valor_total,
+                    })
 
                 # Si todo es exitoso, redirige al usuario
                 return redirect('/sistema/parqueadero/')
