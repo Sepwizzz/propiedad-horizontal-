@@ -380,7 +380,7 @@ def confirmar_salida_parqueadero(request, parqueadero_id):
                     messages.error(request, f"Error al enviar el correo: {str(e)}")
 
                     # Renderizar la factura en HTML como alternativa
-                    return render(request, 'factura_parqueadero2.html', {
+                    return render(request, 'factura_parqueadero.html', {
                         'placa_vehiculo': parqueadero.placa_vehiculo,
                         'fecha_ingreso': parqueadero.fecha_ingreso,
                         'fecha_salida': fecha_salida,
