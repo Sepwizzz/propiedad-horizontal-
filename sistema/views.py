@@ -314,18 +314,18 @@ def confirmar_salida_parqueadero(request, parqueadero_id):
             if parqueadero.estado == 'Activo':
                 fecha_salida = timezone.now()
 
-                # Calcular horas estacionadas en Decimal
+                # Calcular horas estacionadas y redondear hacia arriba
                 horas_estacionado = (fecha_salida - parqueadero.fecha_ingreso).total_seconds() / 3600
-                horas_estacionado_decimal = Decimal(horas_estacionado).quantize(Decimal('0.00'))  # Redondear a 2 decimales
+                horas_estacionado_entero = math.ceil(horas_estacionado)
 
-                # Obtener el valor de fraccion_hora del conjunto relacionado (en Decimal)
+                # Obtener el valor de fraccion_hora del conjunto relacionado
                 conjunto = Conjunto.objects.get(id=parqueadero.id_conjunto.id)
                 valor_fraccion_hora = Decimal(conjunto.fraccion_hora)
 
                 # Calcular el total a pagar
-                valor_total = horas_estacionado_decimal * valor_fraccion_hora
+                valor_total = Decimal(horas_estacionado_entero) * valor_fraccion_hora
 
-                # Monto mínimo
+                # Establecer el monto mínimo
                 if valor_total < Decimal('700.00'):
                     valor_total = Decimal('700.00')
 
@@ -345,13 +345,13 @@ def confirmar_salida_parqueadero(request, parqueadero_id):
                         'placa_vehiculo': parqueadero.placa_vehiculo,
                         'fecha_ingreso': parqueadero.fecha_ingreso,
                         'fecha_salida': fecha_salida,
-                        'horas_estacionado': horas_estacionado_decimal,
+                        'horas_estacionado': horas_estacionado_entero,
                         'valor_fraccion_hora': valor_fraccion_hora,
                         'valor_total': valor_total,
                     })
 
                 # Generar el PDF de la factura
-                pdf_buffer = generar_pdf_xhtml2pdf(parqueadero, valor_total, horas_estacionado, valor_fraccion_hora, fecha_salida)
+                pdf_buffer = generar_pdf_xhtml2pdf(parqueadero, valor_total, horas_estacionado_entero, valor_fraccion_hora, fecha_salida)
 
                 try:
                     if pdf_buffer:
@@ -384,7 +384,7 @@ def confirmar_salida_parqueadero(request, parqueadero_id):
                         'placa_vehiculo': parqueadero.placa_vehiculo,
                         'fecha_ingreso': parqueadero.fecha_ingreso,
                         'fecha_salida': fecha_salida,
-                        'horas_estacionado': horas_estacionado_decimal,
+                        'horas_estacionado': horas_estacionado_entero,
                         'valor_fraccion_hora': valor_fraccion_hora,
                         'valor_total': valor_total,
                     })
